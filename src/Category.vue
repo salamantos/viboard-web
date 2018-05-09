@@ -20,6 +20,7 @@
 <script>
   import VideoBlock from './VideoBlock.vue'
   import {parseBody} from './parseBody.js'
+  import {beneficiaries} from "./beneficiaries";
   
   let golos = require('golos-js');
   
@@ -30,7 +31,7 @@
       VideoBlock,
     },
     
-    mixins: [parseBody],
+    mixins: [parseBody, beneficiaries],
     
     props: {
       method: {
@@ -107,19 +108,13 @@
           if (!err) {
             for (var i = 0; i < result.length; ++i) {
               let v = result[i];
-              if (v.beneficiaries[0]) {
-                if (v.beneficiaries[0].account == "viboard" && v.beneficiaries[0].weight >= 1000) {
-                  console.log("norm")
-                  if (vm.parseBody(v.body)) {
-                    vm.videosList.push({id: i, permlink: v.permlink, author: v.author})
-                    videos_added++;
-                  }
-                  if (videos_added == vm.nVideos) {
-                    break
-                  }
-                }
+              if (vm.parseBody(v.body) && vm.beneficiaries(v)) {
+                vm.videosList.push({id: i, permlink: v.permlink, author: v.author});
+                videos_added++;
               }
-              console.log("ne norm")
+              if (videos_added == vm.nVideos) {
+                break
+              }
             }
           }
         });
@@ -130,8 +125,8 @@
           if (!err) {
             for (var i = 0; i < result.length; ++i) {
               var v = result[i];
-              if (vm.parseBody(v.body)) {
-                vm.videosList.push({id: i, permlink: v.permlink, author: v.author})
+              if (vm.parseBody(v.body) && vm.beneficiaries(v)) {
+                vm.videosList.push({id: i, permlink: v.permlink, author: v.author});
                 videos_added++;
               }
               if (videos_added == vm.nVideos) {
@@ -147,7 +142,7 @@
           if (!err) {
             for (var i = 0; i < result.length; ++i) {
               var v = result[i];
-              if (vm.parseBody(v.body)) {
+              if (vm.parseBody(v.body) && vm.beneficiaries(v)) {
                 vm.videosList.push({id: i, permlink: v.permlink, author: v.author})
                 videos_added++;
               }
